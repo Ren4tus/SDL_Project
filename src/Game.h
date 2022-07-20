@@ -12,7 +12,9 @@ enum KeyPressSurfaces
 };
 class Game {
 public:
-    Game() {}
+    Game() {
+        isMoveDirectionRight = true;
+    }
     ~Game() {}
 
     bool init(const char* title, int xpos, int ypos, int width, int height, int flags);
@@ -25,6 +27,24 @@ public:
 private:
     SDL_Window* m_pWindow;
     SDL_Renderer* m_pRenderer;
+    // 텍스쳐를 저장할 변수
+    SDL_Texture* m_pTexture;
+    // 원본 사각형 - 이미지를 어떻게 잘라서 출력할지
+    SDL_Rect m_sourceRectangle;
+    // 대상 사각형 - 이미지가 화면의 어떤 위치에 출력될지
+    SDL_Rect m_destinationRectangle;
+
+    // 배경
+    SDL_Texture* m_pTextureBackground;
+    SDL_Rect m_sourceRectangleBackground;
+    SDL_Rect m_destinationRectangleBackground;
+
+    const unsigned int SCREEN_WIDTH = 640;
+    const unsigned int SCREEN_HEIGHT = 480;
+
+    // 캐릭터 좌우 이동을 위한 변수
+    bool isMoveDirectionRight;
+
     bool m_bRunning;
     SDL_Event e;
 };
