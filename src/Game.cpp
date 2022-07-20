@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "../include/Common.h"
+#include <string>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -23,7 +25,15 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	else {
 		return false; // SDL 초기화 실패
 	}
+
+	//set random seed from time
 	srand((unsigned int)time(NULL));
+
+	// Initialize Font
+	if (TTF_Init() < 0) {
+		printf("Could not initialize font! (%s)\n", TTF_GetError());
+		return -1;
+	}
 
 	// todo: init에서 빼내기
 	SDL_Surface* pTempSurface = SDL_LoadBMP("assets/rider.bmp");
@@ -75,6 +85,30 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	m_destinationRectangleBackground.w = SCREEN_WIDTH;
 	m_destinationRectangleBackground.h = SCREEN_HEIGHT;
 
+	// 텍스트 폰트 불러오기
+	// Draw text
+	font = TTF_OpenFont("assets/NanumGothic.ttf", 16);
+	if (font == NULL) {
+		printf("Could not open font! (%s)\n", TTF_GetError());
+		return -1;
+	}
+
+	SDL_Color color = { 255, 0, 255, SDL_ALPHA_OPAQUE };
+	std::string riderSize;
+	riderSize = "w: " + std::to_string(m_sourceRectangle.w) + " / h: " + std::to_string(m_sourceRectangle.h);
+	pTempSurface = TTF_RenderText_Blended(font, riderSize.c_str(), color);
+	if (!pTempSurface)
+	{
+		std::cout << "TTF_RenderText_Blended : return was NULL" << std::endl;
+	}
+	textTexture = SDL_CreateTextureFromSurface(m_pRenderer, pTempSurface);
+	if (!textTexture)
+	{
+		std::cout << "SDL_CreateTextureFromSurface : return was NULL" << std::endl;
+	}
+	textDestination = { (int)SCREEN_WIDTH - pTempSurface->w, 0, pTempSurface->w, pTempSurface->h };
+	SDL_FreeSurface(pTempSurface);
+
 	m_bRunning = true;
 	return true;
 }
@@ -86,6 +120,7 @@ void Game::render()
 	isMoveDirectionRight ?
 		SDL_RenderCopyEx(m_pRenderer, m_pTexture, &m_sourceRectangle, &m_destinationRectangle, 0.0, NULL, SDL_FLIP_HORIZONTAL)
 		: SDL_RenderCopy(m_pRenderer, m_pTexture, &m_sourceRectangle, &m_destinationRectangle);
+	SDL_RenderCopy(m_pRenderer, textTexture, NULL, &textDestination);
 	SDL_RenderPresent(m_pRenderer);
 }
 
@@ -113,6 +148,7 @@ void Game::update()
 			isMoveDirectionRight = !isMoveDirectionRight;
 		}
 	}
+
 	SDL_Delay(1);
 }
 bool Game::running() const
@@ -138,5 +174,7 @@ void Game::clean()
 {
 	SDL_DestroyWindow(m_pWindow);
 	SDL_DestroyRenderer(m_pRenderer);
+	SDL_DestroyTexture(textTexture);
+	TTF_CloseFont(font);
 	SDL_Quit();
 }

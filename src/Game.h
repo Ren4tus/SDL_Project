@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 enum KeyPressSurfaces
 {
     KEY_PRESS_SURFACE_DEFAULT,
@@ -44,6 +45,11 @@ private:
 
     // 캐릭터 좌우 이동을 위한 변수
     bool isMoveDirectionRight;
+
+    // 텍스트 변수들
+    TTF_Font* font;
+    SDL_Texture* textTexture;
+    SDL_Rect textDestination;
 
     bool m_bRunning;
     SDL_Event e;
