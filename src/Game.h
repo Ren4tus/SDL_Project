@@ -51,8 +51,12 @@ private:
     SDL_Texture* textTexture;
     SDL_Rect textDestination;
 
-    // 07. 대상상자 원본상자 응용 실습 임시변수
-    SDL_Rect tempRect;
+    // 08. 애니메이션 스프라이트 실습 변수
+    const int FRAME_SIZE = 6;
+
+    // 08. 애니메이션 스프라이트 응용 실습 임시변수
+    SDL_Rect tempRectSource;
+    SDL_Rect tempRectDest;
     bool m_bRunning;
     SDL_Event e;
 };

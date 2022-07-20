@@ -29,14 +29,8 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	//set random seed from time
 	srand((unsigned int)time(NULL));
 
-	// Initialize Font
-	if (TTF_Init() < 0) {
-		printf("Could not initialize font! (%s)\n", TTF_GetError());
-		return -1;
-	}
-
-	// todo: init에서 빼내기
-	SDL_Surface* pTempSurface = SDL_LoadBMP("assets/rider.bmp");
+	SDL_Surface* pTempSurface;
+	pTempSurface = SDL_LoadBMP("Assets/animate.bmp");
 	if (!pTempSurface)
 	{
 		// Return is NULL, an error occurred
@@ -51,14 +45,15 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		return 0;
 	}
 	SDL_FreeSurface(pTempSurface);
-
-	// 원본상자
-	SDL_QueryTexture(m_pTexture, NULL, NULL,
-		&m_sourceRectangle.w, &m_sourceRectangle.h);
-
-	// 대상상자
+	m_sourceRectangle.w = 128;
+	m_sourceRectangle.h = 82;
 	m_destinationRectangle.w = m_sourceRectangle.w;
 	m_destinationRectangle.h = m_sourceRectangle.h;
+	// Initialize Font
+	if (TTF_Init() < 0) {
+		printf("Could not initialize font! (%s)\n", TTF_GetError());
+		return -1;
+	}
 
 	// 배경
 	pTempSurface = IMG_Load("assets/bakcground.png");
@@ -86,13 +81,13 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	m_destinationRectangleBackground.h = SCREEN_HEIGHT;
 
 	// 텍스트 폰트 불러오기
-	// Draw text
 	font = TTF_OpenFont("assets/NanumGothic.ttf", 16);
 	if (font == NULL) {
 		printf("Could not open font! (%s)\n", TTF_GetError());
 		return -1;
 	}
 
+	// rider.bmp의 크기 출력을 위한 텍스트
 	SDL_Color color = { 255, 0, 255, SDL_ALPHA_OPAQUE };
 	std::string riderSize;
 	riderSize = "w: " + std::to_string(m_sourceRectangle.w) + " / h: " + std::to_string(m_sourceRectangle.h);
@@ -109,6 +104,8 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	textDestination = { (int)SCREEN_WIDTH - pTempSurface->w, 0, pTempSurface->w, pTempSurface->h };
 	SDL_FreeSurface(pTempSurface);
 
+
+
 	m_bRunning = true;
 	return true;
 }
@@ -117,12 +114,14 @@ void Game::render()
 {
 	SDL_RenderClear(m_pRenderer);
 	SDL_RenderCopy(m_pRenderer, m_pTextureBackground, &m_sourceRectangleBackground, &m_destinationRectangleBackground);
-	isMoveDirectionRight ?
+	!isMoveDirectionRight ?
 		SDL_RenderCopyEx(m_pRenderer, m_pTexture, &m_sourceRectangle, &m_destinationRectangle, 0.0, NULL, SDL_FLIP_HORIZONTAL)
 		: SDL_RenderCopy(m_pRenderer, m_pTexture, &m_sourceRectangle, &m_destinationRectangle);
+	!isMoveDirectionRight ?
+		SDL_RenderCopyEx(m_pRenderer, m_pTexture, &tempRectSource, &tempRectDest, 0.0, NULL, SDL_FLIP_HORIZONTAL)
+		: SDL_RenderCopy(m_pRenderer, m_pTexture, &tempRectSource, &tempRectDest);
 	SDL_RenderCopy(m_pRenderer, textTexture, NULL, &textDestination);
-	tempRect = { 0,0,m_sourceRectangle.w - 50, m_sourceRectangle.h - 50 };
-	SDL_RenderCopy(m_pRenderer, m_pTexture, &tempRect, &m_destinationRectangle);
+	
 	SDL_RenderPresent(m_pRenderer);
 }
 
@@ -150,7 +149,11 @@ void Game::update()
 			isMoveDirectionRight = !isMoveDirectionRight;
 		}
 	}
-
+	m_sourceRectangle.x = 128 * ((SDL_GetTicks() / 100) % FRAME_SIZE);
+	tempRectSource = m_sourceRectangle;
+	tempRectSource.x = 128 * ((SDL_GetTicks() / 1000) % FRAME_SIZE);
+	tempRectDest = m_destinationRectangle;
+	tempRectDest.y += 100;
 	SDL_Delay(1);
 }
 bool Game::running() const
