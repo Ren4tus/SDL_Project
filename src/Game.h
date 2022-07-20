@@ -51,6 +51,8 @@ private:
     SDL_Texture* textTexture;
     SDL_Rect textDestination;
 
+    // 07. 대상상자 원본상자 응용 실습 임시변수
+    SDL_Rect tempRect;
     bool m_bRunning;
     SDL_Event e;
 };
