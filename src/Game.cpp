@@ -1,4 +1,6 @@
 #include "Game.h"
+#include <cstdlib>
+#include<ctime>
 bool Game::init(const char* title, int xpos, int ypos, int width, int height, int flags)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -10,7 +12,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 				SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
 			}
 			else {
-				return false; // 랜더러 생성 실패
+				return false; // 렌더러 생성 실패
 			}
 		}
 		else {
@@ -20,7 +22,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	else {
 		return false; // SDL 초기화 실패
 	}
-
+	srand((unsigned int)time(NULL));
 	m_bRunning = true;
 	return true;
 }
@@ -33,8 +35,9 @@ void Game::render()
 
 void Game::update()
 {
+	SDL_SetRenderDrawColor(m_pRenderer, rand() % 256, rand() % 256, rand() % 256, 255);
+	SDL_Delay(1000);
 }
-
 bool Game::running() const
 {
 	return m_bRunning;
@@ -52,7 +55,6 @@ void Game::handleEvents()
 			break;
 		}
 	}
-
 }
 
 void Game::clean()
